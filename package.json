@@ -1,0 +1,10 @@
+{
+  "name": "agentforge",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Portable AI agent compiler and control plane prototype",
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}

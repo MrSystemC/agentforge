@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#071116" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
+    <title>AgentForge — генератор агентов</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark"><span></span><span></span><span></span></div>
+          <div>
+            <strong>AgentForge</strong>
+            <small>agent studio</small>
+          </div>
+        </div>
+
+        <div class="workspace-switcher">
+          <div class="workspace-avatar">M</div>
+          <div>
+            <span>Рабочее пространство</span>
+            <strong>Моя команда</strong>
+          </div>
+          <button class="icon-button" aria-label="Открыть меню">⌄</button>
+        </div>
+
+        <nav class="main-nav" aria-label="Основная навигация">
+          <a class="nav-item active" href="#studio"><span class="nav-icon">✦</span> Студия <span class="nav-count">1</span></a>
+          <a class="nav-item" href="#agents"><span class="nav-icon">◈</span> Мои агенты</a>
+          <a class="nav-item" href="#templates"><span class="nav-icon">▦</span> Шаблоны</a>
+          <a class="nav-item" href="#runs"><span class="nav-icon">↯</span> Запуски <span class="status-dot"></span></a>
+        </nav>
+
+        <div class="nav-label">Рабочие пространства</div>
+        <div class="space-list">
+          <button class="space-item"><span class="space-color coral"></span> Контент и маркетинг</button>
+          <button class="space-item"><span class="space-color violet"></span> Операции</button>
+          <button class="space-item"><span class="space-color mint"></span> Исследования</button>
+          <button class="space-add">＋ Новое пространство</button>
+        </div>
+
+        <div class="sidebar-bottom">
+          <a class="nav-item" href="#docs"><span class="nav-icon">?</span> Документация</a>
+          <a class="nav-item" id="settingsNav" href="#openaiSettings"><span class="nav-icon">⚙</span> Настройки</a>
+          <div class="profile-card">
+            <div class="profile-avatar">МК</div>
+            <div class="profile-copy"><strong>Мikle</strong><small>Pro workspace</small></div>
+            <span class="online-dot"></span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content" id="studio">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Студия</span><b>/</b><strong>Новый агент</strong></div>
+          <div class="top-actions">
+            <button class="ghost-button" id="saveDraftBtn"><span>●</span> Сохранить черновик</button>
+            <button class="avatar-button">МК</button>
+          </div>
+        </header>
+
+        <div class="content-wrap">
+          <section class="hero-block">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-dot"></span> AGENT STUDIO <span class="eyebrow-line"></span> v2.4</div>
+              <h1>Соберите агента,<br /><em>который решает.</em></h1>
+              <p class="hero-copy">Опишите задачу обычными словами. AgentForge превратит её в готовую архитектуру, системный промт и сценарий запуска.</p>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+              <div class="core"><span>✦</span></div>
+              <div class="art-node node-a">{ }</div><div class="art-node node-b">◉</div><div class="art-node node-c">↗</div>
+            </div>
+          </section>
+
+          <section class="builder-grid">
+            <div class="prompt-card panel">
+              <div class="panel-heading">
+                <div><span class="step-number">01</span><div><h2>Опишите задачу</h2><p>Промт, бизнес-цель или идея в свободной форме</p></div></div>
+                <span class="live-pill"><span></span> Live builder</span>
+              </div>
+              <div class="prompt-input-wrap">
+                <textarea id="promptInput" maxlength="2000" aria-label="Описание задачи" spellcheck="false" placeholder="Например: нужен агент, который каждое утро анализирует отзывы клиентов, находит повторяющиеся проблемы и отправляет команде короткий отчёт в Telegram..."></textarea>
+                <div class="input-meta"><span id="charCount">0 / 2 000</span><span class="input-hint">⌘ ↵ для генерации</span></div>
+              </div>
+              <div class="prompt-footer">
+                <div class="prompt-tools"><button class="tool-button" title="Прикрепить файл">＋ Файл</button><button class="tool-button" title="Добавить контекст">◌ Контекст</button></div>
+                <button class="generate-button" id="generateBtn"><span class="sparkle">✦</span> Сгенерировать агента <span class="button-arrow">↗</span></button>
+              </div>
+              <div class="example-row"><span>Попробуйте пример</span><button class="example-chip" data-example="Создай ресёрч-агента: собирай свежие новости о рынке недвижимости, проверяй источники и делай дайджест для руководителя по понедельникам.">Рынок недвижимости</button><button class="example-chip" data-example="Нужен ассистент поддержки для интернет-магазина: отвечай на вопросы о заказах, находи статус доставки и передавай сложные случаи оператору.">Поддержка клиентов</button><button class="example-chip" data-example="Собери финансового аналитика: загружай CSV с продажами, ищи аномалии, сравнивай месяцы и готовь выводы для руководства.">Финансовый аналитик</button></div>
+            </div>
+
+            <div class="right-rail">
+              <div class="mini-card panel">
+                <div class="mini-heading"><span class="step-number">02</span><div><h3>Быстрый старт</h3><p>Готовые роли для вашего кейса</p></div></div>
+                <div class="role-list">
+                  <button class="role-card selected" data-role="research"><span class="role-icon blue">⌕</span><span><strong>Исследователь</strong><small>Данные и выводы</small></span><span class="role-check">✓</span></button>
+                  <button class="role-card" data-role="ops"><span class="role-icon orange">↻</span><span><strong>Операционный</strong><small>Процессы и задачи</small></span><span class="role-check">✓</span></button>
+                  <button class="role-card" data-role="creative"><span class="role-icon pink">✎</span><span><strong>Креативный</strong><small>Контент и идеи</small></span><span class="role-check">✓</span></button>
+                </div>
+              </div>
+              <div class="tip-card">
+                <div class="tip-mark">✦</div><div><strong>Хороший вход — сильный агент</strong><p>Добавьте аудиторию, ограничения и формат результата, чтобы получить точнее.</p></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="output-section" id="outputSection">
+            <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span> GENERATED BLUEPRINT</div><h2>Каркас агента</h2></div><div class="heading-actions"><button class="outline-button" id="copyBtn">▣ Копировать JSON</button><button class="primary-small" id="exportBtn">↓ Экспорт</button></div></div>
+            <div class="output-grid">
+              <div class="blueprint-card panel">
+                <div class="agent-header"><div class="agent-symbol">✦</div><div class="agent-title"><span class="tiny-label">AGENT ID <b id="agentId">AF-NEW-001</b></span><h3 id="agentName">Аналитик нового поколения</h3><p id="agentDescription">Универсальный агент для разбора задачи и подготовки следующих шагов.</p></div><button class="more-button">•••</button></div>
+                <div class="metric-row"><div><span>Готовность</span><strong class="green-text">92%</strong></div><div><span>Сложность</span><strong id="complexityText">Средняя</strong></div><div><span>Инструменты</span><strong id="toolCount">04</strong></div><div><span>Версия</span><strong>v1.0</strong></div></div>
+                <div class="progress-track"><span id="progressBar"></span></div>
+                <div class="tabs" role="tablist" aria-label="Представления агента"><button class="tab active" id="tab-overview-tab" role="tab" aria-selected="true" aria-controls="tab-overview" data-tab="overview">Обзор</button><button class="tab" id="tab-prompt-tab" role="tab" aria-selected="false" aria-controls="tab-prompt" data-tab="prompt">Системный промт</button><button class="tab" id="tab-workflow-tab" role="tab" aria-selected="false" aria-controls="tab-workflow" data-tab="workflow">Workflow</button><button class="tab" id="tab-json-tab" role="tab" aria-selected="false" aria-controls="tab-json" data-tab="json">JSON</button></div>
+                <div class="tab-content" id="tab-overview" role="tabpanel" aria-labelledby="tab-overview-tab"><div class="overview-columns"><div><span class="block-label">МИССИЯ</span><p id="missionText">Разобраться в запросе, собрать контекст, проверить факты и выдать понятный результат.</p></div><div><span class="block-label">ПОВЕДЕНИЕ</span><div class="tag-list" id="behaviorTags"><span>Структурный</span><span>Проверяет источники</span><span>Задаёт вопросы</span></div></div></div></div>
+                <div class="tab-content hidden" id="tab-prompt" role="tabpanel" aria-labelledby="tab-prompt-tab"><pre id="systemPrompt">Ты — аналитический AI-агент. Сначала уточни цель и ограничения задачи, затем составь план, проверь входные данные и представь результат в согласованном формате. Всегда отделяй факты от предположений.</pre></div>
+                <div class="tab-content hidden" id="tab-workflow" role="tabpanel" aria-labelledby="tab-workflow-tab"><div class="workflow"><div class="flow-step"><span>01</span><strong>Получить задачу</strong><small>Input parser</small></div><i>→</i><div class="flow-step"><span>02</span><strong>Понять контекст</strong><small>Planner</small></div><i>→</i><div class="flow-step"><span>03</span><strong>Выполнить</strong><small>Tools + memory</small></div><i>→</i><div class="flow-step"><span>04</span><strong>Отдать результат</strong><small>Formatter</small></div></div></div>
+                <div class="tab-content hidden" id="tab-json" role="tabpanel" aria-labelledby="tab-json-tab"><pre id="jsonPreview">{}</pre></div>
+              </div>
+              <div class="side-panels">
+                <div class="side-card panel"><div class="side-card-heading"><div><span class="step-number">03</span><h3>Инструменты</h3></div><button class="plus-button" id="addToolBtn">＋</button></div><p class="side-subtitle">Что агент умеет делать</p><div class="tool-list" id="toolList"><div class="tool-row"><span class="tool-icon violet">⌕</span><div><strong>Web research</strong><small>Поиск и проверка источников</small></div><span class="toggle on"></span></div><div class="tool-row"><span class="tool-icon green">▤</span><div><strong>Работа с файлами</strong><small>CSV, PDF, документы</small></div><span class="toggle on"></span></div><div class="tool-row"><span class="tool-icon orange">↗</span><div><strong>Уведомления</strong><small>Telegram, email, Slack</small></div><span class="toggle on"></span></div><div class="tool-row"><span class="tool-icon blue">◌</span><div><strong>Память</strong><small>История и предпочтения</small></div><span class="toggle"></span></div></div></div>
+                <div class="side-card panel runtime-card"><div class="side-card-heading"><div><span class="step-number">04</span><h3>Среда запуска</h3></div><span class="secure-badge">● Secure</span></div><div class="runtime-select"><span class="runtime-logo">◈</span><span><strong>AgentForge Cloud</strong><small>Автомасштабирование</small></span><span>⌄</span></div><div class="runtime-meta"><span>Лимит запуска</span><strong>1 000 / мес.</strong></div><div class="runtime-meta"><span>Статус</span><strong class="green-text">Готов к запуску</strong></div></div>
+                <div class="side-card panel provider-card" id="openaiProviderCard"><div class="side-card-heading"><div><span class="step-number">07</span><h3>AI-провайдер</h3></div><span class="provider-status" id="openaiStatus"><i></i> Не подключён</span></div><div class="provider-row"><span class="openai-logo">◎</span><div><strong>OpenAI</strong><small id="openaiModelLabel">Подключите модель для запуска</small></div></div><button class="provider-button" id="openaiSettingsBtn">Настроить подключение <span>↗</span></button></div>
+              </div>
+            </div>
+          </section>
+          <section class="control-section" id="controlSection">
+            <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span> CONTROL PLANE</div><h2>Проверка перед запуском</h2></div><div class="heading-note"><span class="pulse-ring"></span> Система готовит доказательства качества</div></div>
+            <div class="control-grid">
+              <div class="simulation-card panel">
+                <div class="control-card-heading"><div><span class="step-number">05</span><div><h3>Simulation Lab</h3><p>Прогоните агента на синтетических сценариях до публикации</p></div></div><span class="lab-badge">10 CASES</span></div>
+                <div class="simulation-body">
+                  <div class="case-column"><span class="block-label">СЦЕНАРИИ</span><div class="case-list" id="caseList"><button class="case-item selected" data-case="support"><span>01</span><div><strong>Сложный запрос клиента</strong><small>Проверка эскалации</small></div><b>✓</b></button><button class="case-item" data-case="research"><span>02</span><div><strong>Противоречивые источники</strong><small>Проверка фактов</small></div><b>◌</b></button><button class="case-item" data-case="sensitive"><span>03</span><div><strong>Опасное действие</strong><small>Проверка guardrails</small></div><b>◌</b></button></div><button class="run-button" id="runSimulationBtn"><span>▶</span> Запустить симуляцию</button></div>
+                  <div class="trace-column"><div class="trace-top"><span class="block-label">LIVE TRACE</span><span class="trace-status" id="traceStatus"><span></span> Готов</span></div><div class="trace-window" id="traceWindow"><div class="trace-line muted"><i>14:32:01</i><span class="trace-node neutral">⌁</span><strong>Сценарий ожидает запуска</strong></div><div class="trace-line muted"><i>—</i><span class="trace-node neutral">◌</span><span>Планировщик и guardrails будут проверены</span></div><div class="trace-line muted"><i>—</i><span class="trace-node neutral">◇</span><span>Результат появится здесь</span></div></div><div class="score-block"><div><span>Оценка сценария</span><strong id="simulationScore">—</strong></div><div class="score-bar"><span id="simulationProgress"></span></div><small id="simulationHint">Запустите тест, чтобы увидеть решение агента по шагам</small></div></div>
+                </div>
+              </div>
+              <div class="passport-card panel">
+                <div class="control-card-heading"><div><span class="step-number">06</span><div><h3>Agent Passport</h3><p>Цифровая идентичность и границы полномочий</p></div></div><span class="verified-badge">✓ VERIFIED</span></div>
+                <div class="passport-id"><span class="passport-emblem">◈</span><div><span>ПОДПИСАННЫЙ MANIFEST</span><strong id="passportHash">af_7d4e…91c2</strong></div><button class="copy-mini" id="copyHashBtn" aria-label="Скопировать хеш">▣</button></div>
+                <div class="passport-rows"><div><span>Владелец</span><strong>Моя команда</strong></div><div><span>Уровень риска</span><strong class="risk-medium" id="riskLevel">Средний · 32/100</strong></div><div><span>Одобрение</span><strong class="green-text">Human-in-the-loop</strong></div><div><span>Срок памяти</span><strong>30 дней</strong></div></div>
+                <div class="risk-strip"><div class="risk-label"><span>RISK MAP</span><strong id="riskSummary">2 контроля требуют внимания</strong></div><div class="risk-bars"><span class="risk-safe"></span><span class="risk-warn"></span><span class="risk-danger"></span></div><div class="risk-legend"><span><i class="safe-dot"></i> Данные</span><span><i class="warn-dot"></i> Инструменты</span><span><i class="danger-dot"></i> Действия</span></div></div>
+                <button class="passport-button" id="passportBtn">Открыть полный паспорт <span>↗</span></button>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="footer"><span>AgentForge © 2026</span><span><span class="footer-dot"></span> Все системы работают</span><span>Сделано для тех, кто строит будущее</span></footer>
+      </main>
+    </div>
+    <div class="modal-backdrop hidden" id="openaiModal" aria-hidden="true">
+      <section class="connection-modal" role="dialog" aria-modal="true" aria-labelledby="openaiModalTitle">
+        <div class="modal-top"><div><div class="eyebrow"><span class="eyebrow-dot"></span> ADMIN / PROVIDERS</div><h2 id="openaiModalTitle">Подключение OpenAI</h2><p>Добавьте API-ключ один раз. AgentForge проверит доступ на сервере и не сохранит секрет в браузере.</p></div><button class="modal-close" id="openaiCloseBtn" aria-label="Закрыть">×</button></div>
+        <form id="openaiForm">
+          <label class="form-label" for="openaiApiKey">Secret API key <span>обязательно</span></label>
+          <div class="secret-input"><input id="openaiApiKey" type="password" autocomplete="new-password" placeholder="sk-proj-••••••••••••••••" required minlength="20" /><button type="button" id="toggleKeyBtn" aria-label="Показать или скрыть ключ">◉</button></div>
+          <p class="form-help">Ключ используется только сервером для проверки и запросов. Он не попадает в localStorage и не выводится в интерфейсе.</p>
+          <label class="form-label" for="openaiModel">Модель по умолчанию</label>
+          <select id="openaiModel"><option value="gpt-6.2-astra">GPT-6.2 Astra — сложные задачи</option><option value="gpt-6.2-sol">GPT-6.2 Sol — быстрые задачи</option><option value="gpt-5.6-sol">GPT-5.6 Sol — экономичный режим</option></select>
+          <div class="connection-notice" id="openaiNotice"><span>◎</span><div><strong>Готово к настройке</strong><small>После проверки можно сразу запускать агентов через OpenAI.</small></div></div>
+          <div class="modal-actions"><button type="button" class="disconnect-button hidden" id="openaiDisconnectBtn">Отключить</button><button type="submit" class="connect-button" id="openaiConnectBtn"><span>↯</span> Проверить и подключить</button></div>
+        </form>
+      </section>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><span id="toastText">Готово</span></div>
+    <script src="app.js"></script>
+  </body>
+</html>
