@@ -21,7 +21,11 @@ export async function verifyPassword(password, encoded) {
   const [algorithm, n, r, p, saltText, hashText] = String(encoded || '').split('$');
   if (algorithm !== 'scrypt' || !saltText || !hashText) return false;
   try {
-    const derived = await scrypt(String(password), Buffer.from(saltText, 'base64url'), 64, { N: Number(n), r: Number(r), p: Number(p) });
+    const cost = Number(n);
+    const blockSize = Number(r);
+    const parallelization = Number(p);
+    if (!Number.isInteger(cost) || cost < 16_384 || cost > 262_144 || !Number.isInteger(blockSize) || blockSize < 1 || blockSize > 32 || !Number.isInteger(parallelization) || parallelization < 1 || parallelization > 8) return false;
+    const derived = await scrypt(String(password), Buffer.from(saltText, 'base64url'), 64, { N: cost, r: blockSize, p: parallelization });
     const expected = Buffer.from(hashText, 'base64url');
     return expected.length === derived.length && timingSafeEqual(expected, Buffer.from(derived));
   } catch {
@@ -35,7 +39,8 @@ export function parseCookies(header) {
     if (index < 0) return cookies;
     const key = part.slice(0, index).trim();
     const value = part.slice(index + 1).trim();
-    if (key) cookies[key] = decodeURIComponent(value);
+    if (!key) return cookies;
+    try { cookies[key] = decodeURIComponent(value); } catch { /* Ignore malformed cookies. */ }
     return cookies;
   }, {});
 }
