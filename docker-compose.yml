@@ -3,6 +3,13 @@ services:
     build: .
     image: agentforge:latest
     restart: unless-stopped
+    init: true
+    stop_grace_period: 15s
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
     env_file:
       - .env
     ports:
