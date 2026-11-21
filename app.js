@@ -188,6 +188,7 @@ document.addEventListener('click', async (event) => {
   const status = event.target.closest('[data-agent-status]'); if (status) { state.agentStatus = status.dataset.agentStatus; render(); return; }
   const actionButton = event.target.closest('[data-action]'); if (!actionButton) return;
   const action = actionButton.dataset.action;
+  if (action === 'workspace-menu') { state.view = 'settings'; render(); return; }
   if (action === 'new-agent') { state.view = 'studio'; state.blueprint = null; state.selectedAgent = null; state.lastRun = null; state.draft = { prompt: '', role: state.settings.defaultRole || 'research', context: [] }; state.context = []; render(); return; }
   if (action === 'save-draft') return saveDraft();
   if (action === 'attach-context') return fileInput.click();
