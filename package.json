@@ -1,12 +1,14 @@
 {
   "name": "agentforge",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Portable AI agent compiler and local control plane",
+  "description": "Production-ready AI agent compiler and control plane",
   "scripts": {
     "start": "node server.mjs",
+    "start:production": "NODE_ENV=production node server.mjs",
     "test": "node --test",
-    "check": "node --check server.mjs && node --check app.js"
+    "test:ci": "npm run check && npm test",
+    "check": "node --check config.mjs && node --check security.mjs && node --check storage.mjs && node --check server.mjs && node --check app.js"
   }
 }

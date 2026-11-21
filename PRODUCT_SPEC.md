@@ -46,7 +46,7 @@ The first target users are SMB operators, AI agencies and product teams that nee
 
 ```json
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "id": "agent-id",
   "mission": "what the agent accomplishes",
   "inputs": [],
@@ -69,13 +69,13 @@ This model follows current OWASP agentic risk guidance and NIST work on agent id
 
 ## Delivery roadmap
 
-### P0 — current prototype
+### P0 — delivered production foundation
 
-Prompt-to-blueprint, role packs, Agent Passport, Simulation Lab, local traces, risk map, JSON export, local API, responsive Studio.
+Prompt-to-blueprint, role packs, Agent Passport, Simulation Lab, local traces, risk map, JSON export, API v1, session access control, audit events, schema migrations, atomic persistence, rollback, idempotent writes, health endpoints, metrics, Docker deployment and responsive Studio.
 
-### P1 — production core
+### P1 — execution platform
 
-Provider adapters, MCP gateway, Postgres/RLS, Redis worker queue, durable runs, approvals, secret references, OpenTelemetry traces, eval suites, version diff and rollback.
+Provider adapters, MCP gateway, Postgres/RLS, Redis worker queue, durable runs, approvals, secret references, OpenTelemetry traces, eval suites and version diff.
 
 ### P2 — distribution
 

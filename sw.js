@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agentforge-release-v1';
+const CACHE_NAME = 'agentforge-release-v2';
 const SHELL = ['/', '/index.html', '/styles.css', '/app.js', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

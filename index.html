@@ -36,10 +36,10 @@
       <main class="main-content">
         <header class="topbar">
           <div class="breadcrumbs"><span id="breadcrumbRoot">Студия</span><b>/</b><strong id="breadcrumbCurrent">Новый агент</strong></div>
-          <div class="top-actions"><span class="connection-pill" id="connectionStatus"><i></i> Проверка системы</span><button class="ghost-button" data-action="save-draft" type="button"><span>●</span> Сохранить черновик</button><button class="avatar-button" data-view="settings" type="button">МК</button></div>
+          <div class="top-actions"><span class="connection-pill" id="connectionStatus"><i></i> Проверка системы</span><button class="ghost-button" data-action="save-draft" type="button"><span>●</span> Сохранить черновик</button><button class="ghost-button hidden" id="logoutButton" data-action="logout" type="button">Выйти</button><button class="avatar-button" data-view="settings" type="button">МК</button></div>
         </header>
         <div class="content-wrap" id="viewRoot" aria-live="polite"></div>
-        <footer class="footer"><span>AgentForge <span id="footerVersion">v1.0.0</span></span><span><span class="footer-dot"></span> <span id="footerState">Система готова</span></span><span>Локальное управление данными</span></footer>
+        <footer class="footer"><span>AgentForge <span id="footerVersion">v2.0.0</span></span><span><span class="footer-dot"></span> <span id="footerState">Система готова</span></span><span>Локальное управление данными</span></footer>
       </main>
     </div>
 
@@ -53,6 +53,20 @@
         <div id="modalBody"></div>
       </section>
     </div>
+    <section class="auth-gate hidden" id="authGate" aria-hidden="true">
+      <div class="auth-card panel">
+        <div class="brand auth-brand"><div class="brand-mark"><span></span><span></span><span></span></div><div><strong>AgentForge</strong><small>secure workspace</small></div></div>
+        <div class="eyebrow"><span class="eyebrow-dot"></span> WORKSPACE ACCESS</div>
+        <h1>Войдите в рабочее пространство</h1>
+        <p class="auth-copy">Доступ к агентам, запускам и журналу действий защищён сессионной авторизацией.</p>
+        <form id="authForm" class="auth-form">
+          <label>Email<input name="email" type="email" autocomplete="username" required placeholder="owner@example.com" /></label>
+          <label>Пароль<input name="password" type="password" autocomplete="current-password" required minlength="8" /></label>
+          <p class="auth-error" id="authError" role="alert"></p>
+          <button class="button primary full" type="submit">Войти в workspace <span>↗</span></button>
+        </form>
+      </div>
+    </section>
     <script type="module" src="app.js"></script>
   </body>
 </html>

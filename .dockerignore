@@ -1,0 +1,14 @@
+.git
+.gitignore
+.codex
+node_modules
+.env
+.env.*
+!.env.example
+data/*.json
+data/*.tmp
+upload
+*.zip
+README.md
+PRODUCT_SPEC.md
+test
