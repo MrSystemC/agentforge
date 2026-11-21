@@ -2,80 +2,83 @@
 
 **Из промта — в проверяемого цифрового сотрудника.**
 
-AgentForge — прототип нейтральной к провайдеру control plane для создания AI-агентов и ботов. Он превращает описание задачи в переносимый `Agent Passport`, показывает границы полномочий, прогоняет сценарии до запуска и экспортирует версионируемую спецификацию.
+AgentForge — локальный control plane для проектирования, проверки и хранения AI-агентов. Описание задачи превращается в переносимый `Agent Passport` с миссией, инструментами, workflow, памятью, бюджетом, guardrails и тестовыми сценариями.
 
-## Уже реализовано
+## Возможности релиза 1.0
 
-- генерация blueprint по свободному описанию на русском языке;
-- роли исследователя, операционного координатора и креативного партнёра;
-- переносимый `AgentSpec` с миссией, инструментами, моделью, памятью, workflow, бюджетами и guardrails;
-- assumptions, clarification questions, generated tests и risk flags;
-- Simulation Lab с тестовыми кейсами, live trace, оценкой качества и risk map;
-- Agent Passport с идентификатором, уровнем риска и human-in-the-loop;
-- переключение и добавление инструментов;
-- вкладки обзора, системного промта, workflow и JSON;
-- экспорт `.agentforge.json` и копирование паспорта;
-- сохранение черновика в `localStorage`;
-- клавиатурный shortcut `Ctrl/Cmd + Enter`;
-- CSP, ограничение ввода 2 000 символов, безопасный вывод пользовательского текста;
-- адаптивный UI и базовые WCAG-улучшения;
-- локальный Node control-plane с `GET /api/health` и `POST /api/agent-spec`.
-- админский блок OpenAI с проверкой ключа, выбором модели, статусом, маской секрета и отключением.
+- Studio с детерминированной локальной генерацией и подключаемым OpenAI-провайдером;
+- три готовые специализации — исследователь, операционный координатор и креативный партнёр;
+- контекстные файлы до восьми вложений с ограничением размера и безопасным выводом;
+- паспорт агента с версией схемы, хэшем, риском, разрешениями, assumptions и clarification questions;
+- управление инструментами — Web research, файлы, уведомления, память, API actions, code execution и browser automation;
+- workflow с этапами intake, plan, retrieve, act, review и respond;
+- Simulation Lab с готовыми кейсами, live trace, score и risk map;
+- рабочее пространство с CRUD-операциями, поиском, фильтрами, дублированием и удалением агентов;
+- история запусков с трассировкой и результатами;
+- импорт и экспорт `.agentforge.json`, копирование JSON и загрузка стартовых шаблонов;
+- настройки команды, роль по умолчанию, уведомления и статус AI-провайдера;
+- PWA manifest, service worker, адаптивный интерфейс и автономный fallback-режим;
+- локальное атомарное JSON-хранилище, готовое к замене на SQL/Redis в следующем контуре.
 
-## Запуск
-
-Для статического режима откройте `index.html`.
-
-Для режима с локальным API:
+## Быстрый запуск
 
 ```bash
+npm install
 npm start
 ```
 
-Откройте `http://localhost:4173`.
+Откройте [http://localhost:4173](http://localhost:4173).
 
-В интерфейсе откройте «Настройки» или карточку «AI-провайдер». Вставьте API-ключ OpenAI и выберите модель. Ключ отправляется только на серверный endpoint, проверяется через `/v1/models` и хранится только в памяти текущего процесса. После перезапуска сервера его потребуется подключить снова.
-
-Для серверного запуска также можно заранее задать `OPENAI_API_KEY` и при необходимости `OPENAI_MODEL`. Панель администратора остаётся основным способом подключения без ручной настройки окружения.
-
-Проверка API:
+Для проверки синтаксиса и бизнес-логики:
 
 ```bash
-curl http://localhost:4173/api/health
-curl -X POST http://localhost:4173/api/agent-spec \
-  -H 'content-type: application/json' \
-  -d '{"prompt":"Анализируй отзывы клиентов и отправляй отчёт в Telegram","role":"research"}'
+npm run check
+npm test
 ```
 
-OpenAI endpoints:
+## Подключение OpenAI
 
-- `GET /api/integrations/openai/status`
-- `POST /api/integrations/openai/connect`
-- `POST /api/integrations/openai/test`
-- `POST /api/integrations/openai/disconnect`
-- `POST /api/openai/generate`
+В интерфейсе откройте «Настройки», вставьте API-ключ и выберите модель. Сервер проверяет ключ через официальный API, хранит его только в памяти текущего процесса и не добавляет секрет в паспорт или `localStorage`.
 
-## Продуктовая концепция
+Для серверного старта можно задать переменные окружения:
 
-Основное преимущество AgentForge — связка **requirement-to-agent compiler + simulation + governance**. Пользователь получает не только промт, но и объяснимый контракт агента, тесты, разрешения, риски и доказательство готовности.
+```bash
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-6.2-astra
+npm start
+```
 
-Полноценный production-контур должен включать:
+Без ключа приложение полноценно работает в локальном детерминированном режиме.
 
-- MCP/A2A gateway и адаптеры OpenAI, Anthropic, Gemini, локальных моделей;
-- Postgres с tenant isolation и RLS, Redis/BullMQ для resumable runs, S3-совместимое хранилище;
-- sandboxed tool workers, short-lived scoped tokens, Vault/secret references;
-- immutable audit ledger, replay, OpenTelemetry traces и regression evals;
-- approval gates, DLP/PII redaction, egress policy, kill switch и rate budgets;
-- web, REST, webhook, Telegram и Slack deployments;
-- registry шаблонов, verified connectors и marketplace.
+## API
+
+- `GET /api/health` — состояние control plane;
+- `GET /api/bootstrap` — рабочее пространство, агенты, запуски, шаблоны и настройки;
+- `GET /api/templates` — каталог стартовых шаблонов;
+- `GET /api/agents` и `POST /api/agents` — список и создание агентов;
+- `GET/PATCH/DELETE /api/agents/:id` — просмотр, изменение и удаление агента;
+- `POST /api/agents/:id/duplicate` — дублирование паспорта;
+- `POST /api/agents/:id/runs` — тестовый запуск сценария;
+- `GET /api/runs` — история запусков;
+- `POST /api/agent-spec` — генерация паспорта;
+- `POST /api/import` — импорт паспорта;
+- `PATCH /api/draft` и `PATCH /api/settings` — сохранение черновика и настроек;
+- `/api/integrations/openai/*` — подключение, проверка и отключение провайдера;
+- `POST /api/openai/generate` — запрос к подключённой модели.
 
 ## Структура
 
-- `index.html` — интерфейс Studio, Simulation Lab и Agent Passport;
-- `styles.css` — визуальная система digital ecosystem;
-- `app.js` — генератор спецификации, simulation trace, guardrails и экспорт;
-- `server.mjs` — локальный API и статический сервер;
-- `package.json` — команда запуска;
-- `PRODUCT_SPEC.md` — продуктовая стратегия, AgentSpec, roadmap и источники исследования.
+- `index.html` — оболочка приложения и доступные view;
+- `styles.css` — адаптивная визуальная система;
+- `app.js` — состояние клиента, Studio, workspace, шаблоны, импорт/экспорт и UX;
+- `server.mjs` — API, persistence, simulation и static server;
+- `manifest.webmanifest` и `sw.js` — PWA-слой;
+- `test/server.test.mjs` — автоматические тесты генерации и симуляции;
+- `PRODUCT_SPEC.md` — продуктовая стратегия и AgentSpec;
+- `agentforge-generator.zip` — исходный архив генератора.
 
-В текущем прототипе генерация работает детерминированно локально. Точка подключения реального LLM — API `POST /api/agent-spec` и функция `buildBlueprint()`.
+## Данные и расширение
+
+Рабочие данные сохраняются в `data/agentforge.json`. Файл создаётся автоматически и исключён из Git. Для отдельного окружения можно указать другой путь через `AGENTFORGE_DATA_FILE`.
+
+Текущий persistence-слой рассчитан на локальный релиз и совместим с дальнейшей заменой на Postgres, Redis/BullMQ, S3, OpenTelemetry, scoped secrets, approval gates и внешние deployment-адаптеры.

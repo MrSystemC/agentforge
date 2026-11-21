@@ -1,0 +1,11 @@
+{
+  "name": "AgentForge",
+  "short_name": "AgentForge",
+  "description": "Рабочая среда для проектирования и проверки AI-агентов",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071116",
+  "theme_color": "#071116",
+  "lang": "ru",
+  "icons": []
+}
