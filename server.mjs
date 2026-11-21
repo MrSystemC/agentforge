@@ -451,8 +451,11 @@ function ifMatchMatches(request, agent) {
   return !expected || expected === '*' || expected === agent.updatedAt;
 }
 
-function idempotencyKey(request) {
-  return text(request.headers['idempotency-key'], 160);
+function idempotencyKey(request, pathname) {
+  const supplied = text(request.headers['idempotency-key'], 160);
+  if (!supplied) return '';
+  const scope = [request.user?.workspaceId || store.data.workspace.id, request.user?.id || 'anonymous', request.method, pathname, supplied].join(':');
+  return hashToken(scope);
 }
 
 async function handleApi(request, response, url, id) {
@@ -554,7 +557,7 @@ async function handleApi(request, response, url, id) {
   if (request.method === 'POST' && pathname === '/api/agent-spec') return sendJson(response, 200, buildSpec(await readJson(request, id)), id);
   if (request.method === 'POST' && pathname === '/api/import') {
     const payload = await readJson(request, id, 500_000);
-    const key = idempotencyKey(request);
+    const key = idempotencyKey(request, pathname);
     if (key && store.data.idempotency[key]) return sendJson(response, 200, store.data.idempotency[key], id);
     const result = await store.mutate((draft) => {
       const spec = normalizeSpec(payload.spec || payload);
@@ -576,7 +579,7 @@ async function handleApi(request, response, url, id) {
     return sendJson(response, 200, { agents: visibleAgents().filter((agent) => matchAgent(agent, search) && (!status || status === 'all' || agent.status === status)), stats: stats() }, id);
   }
   if (!agentId && request.method === 'POST') {
-    const key = idempotencyKey(request);
+    const key = idempotencyKey(request, pathname);
     if (key && store.data.idempotency[key]) return sendJson(response, 200, store.data.idempotency[key], id);
     const payload = await readJson(request, id, 500_000);
     const result = await store.mutate((draft) => {
@@ -614,9 +617,10 @@ async function handleApi(request, response, url, id) {
     return sendJson(response, 200, result, id, { etag: result.agent.updatedAt });
   }
   if (request.method === 'DELETE' && parts.length === 3) {
+    if (!ifMatchMatches(request, agent)) return sendError(response, 409, 'version_conflict', 'Агент уже изменён другим запросом', id, { currentUpdatedAt: agent.updatedAt });
     const result = await store.mutate((draft) => {
       const target = draft.agents.find((item) => item.id === agentId);
-      if (!target) return { deleted: agentId };
+      if (!target || !ifMatchMatches(request, target)) throw Object.assign(new Error('version_conflict'), { status: 409 });
       target.status = 'archived';
       target.deletedAt = now();
       target.updatedAt = target.deletedAt;
@@ -626,9 +630,10 @@ async function handleApi(request, response, url, id) {
     return sendJson(response, 200, result, id);
   }
   if (request.method === 'POST' && parts[3] === 'restore') {
+    if (!ifMatchMatches(request, agent)) return sendError(response, 409, 'version_conflict', 'Агент уже изменён другим запросом', id, { currentUpdatedAt: agent.updatedAt });
     const result = await store.mutate((draft) => {
       const target = draft.agents.find((item) => item.id === agentId);
-      if (!target) throw Object.assign(new Error('agent_not_found'), { status: 404 });
+      if (!target || !ifMatchMatches(request, target)) throw Object.assign(new Error(target ? 'version_conflict' : 'agent_not_found'), { status: target ? 409 : 404 });
       target.deletedAt = null;
       target.status = 'draft';
       target.updatedAt = now();
@@ -638,11 +643,14 @@ async function handleApi(request, response, url, id) {
     return sendJson(response, 200, result, id);
   }
   if (request.method === 'POST' && parts[3] === 'rollback') {
+    if (!ifMatchMatches(request, agent)) return sendError(response, 409, 'version_conflict', 'Агент уже изменён другим запросом', id, { currentUpdatedAt: agent.updatedAt });
     const payload = await readJson(request, id, 20_000);
     const result = await store.mutate((draft) => {
       const target = draft.agents.find((item) => item.id === agentId);
       const version = target?.versions?.[Number(payload.version) - 1];
-      if (!target || !version) throw Object.assign(new Error('version_not_found'), { status: 404 });
+      if (!target) throw Object.assign(new Error('agent_not_found'), { status: 404 });
+      if (!ifMatchMatches(request, target)) throw Object.assign(new Error('version_conflict'), { status: 409 });
+      if (!version) throw Object.assign(new Error('version_not_found'), { status: 404 });
       target.spec = structuredClone(version.spec);
       target.spec.updatedAt = now();
       target.spec.passportHash = hashSpec(target.spec);
@@ -664,7 +672,7 @@ async function handleApi(request, response, url, id) {
     return sendJson(response, 201, result, id);
   }
   if (request.method === 'POST' && parts[3] === 'runs') {
-    const key = idempotencyKey(request);
+    const key = idempotencyKey(request, pathname);
     if (key && store.data.idempotency[key]) return sendJson(response, 200, store.data.idempotency[key], id);
     const payload = await readJson(request, id, 50_000);
     metrics.activeRuns += 1;
